@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: orchestrator
+  name: orchestrator-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: orchestrator
+  template:
+    metadata:
+      labels:
+        app: orchestrator
+    spec:
+      containers:
+        - name: orchestrator
+          image: orchestrator # minikube load image <image-name>
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: UTOPIA_MICROSERVICE_ORCHESTRATOR_PORT
+              valueFrom:
+                secretKeyRef:
+                  key: orchestrator_port
+                  name: utopia-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: orchestrator-service
+spec:
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+      nodePort: 30100
+  selector:
+    app: orchestrator

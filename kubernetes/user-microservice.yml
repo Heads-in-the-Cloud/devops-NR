@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: user
+  name: user-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user
+  template:
+    metadata:
+      labels:
+        app: user
+    spec:
+      containers:
+        - name: user
+          image: user # minikube load image <image-name>
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8083
+          env:
+            - name: UTOPIA_DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  key: db_host
+                  name: utopia-secret
+            - name: UTOPIA_DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  key: db_name
+                  name: utopia-secret
+            - name: UTOPIA_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: db_password
+                  name: utopia-secret
+            - name: UTOPIA_DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  key: db_port
+                  name: utopia-secret
+            - name: UTOPIA_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  key: db_user
+                  name: utopia-secret
+            - name: UTOPIA_JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: jwt_secret
+                  name: utopia-secret
+            - name: UTOPIA_MICROSERVICE_USERS_PORT
+              valueFrom:
+                secretKeyRef:
+                  key: user_port
+                  name: utopia-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+spec:
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8083
+  selector:
+    app: user
