@@ -1,7 +1,7 @@
 version: "3"
 services:
   auth-microservice:
-    build: ../auth/
+    build: ../../auth/
     image: auth
     container_name: auth
     ports:
@@ -9,7 +9,7 @@ services:
     env_file:
       - .env
   user-microservice:
-    build: ../user/
+    build: ../../user/
     image: user
     container_name: user
     ports:
@@ -17,7 +17,7 @@ services:
     env_file:
       - .env
   flight-microservice:
-    build: ../flight/
+    build: ../../flight/
     image: flight
     container_name: flight
     ports:
@@ -25,18 +25,20 @@ services:
     env_file:
       - .env
   booking-microservice:
-    build: ../flight/
+    build: ../../booking/
     image: booking
     container_name: booking
     ports:
-      - "${UTOPIA_MICROSERVICE_BOOKINGS_PORT}:${UTOPIA_MICROSERVICE_BOOKINGS_PORT}"
+      - "${UTOPIA_MICROSERVICE_BOOKINGS_PORT}:${UTOPIA_MICROSERVICE_BOOKINGS_PO\
+        RT}"
     env_file:
       - .env
   orchestrator:
-    build: ../orchestrator/
+    build: ../../orchestrator/
     image: orchestrator
     container_name: orchestrator
     ports:
-      - "${UTOPIA_MICROSERVICE_ORCHESTRATOR_PORT}:${UTOPIA_MICROSERVICE_ORCHESTRATOR_PORT}"
+      - "${UTOPIA_MICROSERVICE_ORCHESTRATOR_PORT}:${UTOPIA_MICROSERVICE_ORCHEST\
+        RATOR_PORT}"
     env_file:
       - .env
