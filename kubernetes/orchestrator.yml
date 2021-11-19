@@ -26,6 +26,26 @@ spec:
                 secretKeyRef:
                   key: orchestrator_port
                   name: utopia-secret
+            - name: UTOPIA_MICROSERVICE_AUTH_URI
+              valueFrom:
+                configMapKeyRef:
+                  key: auth-url
+                  name: utopia-configmap
+            - name: UTOPIA_MICROSERVICE_BOOKINGS_URI
+              valueFrom:
+                configMapKeyRef:
+                  key: booking-url
+                  name: utopia-configmap
+            - name: UTOPIA_MICROSERVICE_FLIGHTS_URI
+              valueFrom:
+                configMapKeyRef:
+                  key: flight-url
+                  name: utopia-configmap
+            - name: UTOPIA_MICROSERVICE_USERS_URI
+              valueFrom:
+                configMapKeyRef:
+                  key: user-url
+                  name: utopia-configmap
 ---
 apiVersion: v1
 kind: Service
