@@ -30,22 +30,22 @@ spec:
               valueFrom:
                 configMapKeyRef:
                   key: auth-url
-                  name: utopia-configmap
+                  name: utopia-config
             - name: UTOPIA_MICROSERVICE_BOOKINGS_URI
               valueFrom:
                 configMapKeyRef:
                   key: booking-url
-                  name: utopia-configmap
+                  name: utopia-config
             - name: UTOPIA_MICROSERVICE_FLIGHTS_URI
               valueFrom:
                 configMapKeyRef:
                   key: flight-url
-                  name: utopia-configmap
+                  name: utopia-config
             - name: UTOPIA_MICROSERVICE_USERS_URI
               valueFrom:
                 configMapKeyRef:
                   key: user-url
-                  name: utopia-configmap
+                  name: utopia-config
 ---
 apiVersion: v1
 kind: Service
