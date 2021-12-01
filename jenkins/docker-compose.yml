@@ -1,0 +1,34 @@
+version: "3"
+services:
+  auth-microservice:
+    build: ../../auth/
+    image: auth
+    container_name: auth
+    ports:
+      - "${UTOPIA_MICROSERVICE_AUTH_PORT}:${UTOPIA_MICROSERVICE_AUTH_PORT}"
+  user-microservice:
+    build: ../../user/
+    image: user
+    container_name: user
+    ports:
+      - "${UTOPIA_MICROSERVICE_USERS_PORT}:${UTOPIA_MICROSERVICE_USERS_PORT}"
+  flight-microservice:
+    build: ../../flight/
+    image: flight
+    container_name: flight
+    ports:
+      - "${UTOPIA_MICROSERVICE_FLIGHTS_PORT}:${UTOPIA_MICROSERVICE_FLIGHTS_PORT}"
+  booking-microservice:
+    build: ../../booking/
+    image: booking
+    container_name: booking
+    ports:
+      - "${UTOPIA_MICROSERVICE_BOOKINGS_PORT}:${UTOPIA_MICROSERVICE_BOOKINGS_PO\
+        RT}"
+  orchestrator:
+    build: ../../orchestrator/
+    image: orchestrator
+    container_name: orchestrator
+    ports:
+      - "${UTOPIA_MICROSERVICE_ORCHESTRATOR_PORT}:${UTOPIA_MICROSERVICE_ORCHEST\
+        RATOR_PORT}"
