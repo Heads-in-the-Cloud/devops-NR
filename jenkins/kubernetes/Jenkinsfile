@@ -16,19 +16,9 @@ pipeline {
     }
 
     stages {
-        stage('Load images') {
-            steps {
-                sh "minikube image load auth"
-                sh "minikube image load user"
-                sh "minikube image load flight"
-                sh "minikube image load booking"
-                sh "minikube image load orchestrator"
-            }
-        }
         stage('Apply') {
             steps {
                 sh 'kubectl apply -f .'
-                sh 'sleep 120'
             }
         }
         stage('Delete') {
