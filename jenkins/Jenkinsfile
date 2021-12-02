@@ -21,10 +21,5 @@ pipeline {
                 sh "docker-compose -f jenkins/docker-compose.yml up -d"
             }
         }
-        stage('Destroy') {
-            steps{
-                sh "docker-compose -f jenkins/docker-compose.yml down"
-            }
-        }
     }
 }
