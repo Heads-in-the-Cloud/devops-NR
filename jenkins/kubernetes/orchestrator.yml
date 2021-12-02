@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: orchestrator
+  name: orchestrator-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: orchestrator
+  template:
+    metadata:
+      labels:
+        app: orchestrator
+    spec:
+      containers:
+        - name: orchestrator
+          image: orchestrator # minikube load image <image-name>
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: UTOPIA_MICROSERVICE_ORCHESTRATOR_PORT
+              value: ${UTOPIA_MICROSERVICE_ORCHESTRATOR_PORT}
+            - name: UTOPIA_MICROSERVICE_AUTH_URI
+              valueFrom:
+                configMapKeyRef:
+                  key: auth-url
+                  name: utopia-config
+            - name: UTOPIA_MICROSERVICE_BOOKINGS_URI
+              valueFrom:
+                configMapKeyRef:
+                  key: booking-url
+                  name: utopia-config
+            - name: UTOPIA_MICROSERVICE_FLIGHTS_URI
+              valueFrom:
+                configMapKeyRef:
+                  key: flight-url
+                  name: utopia-config
+            - name: UTOPIA_MICROSERVICE_USERS_URI
+              valueFrom:
+                configMapKeyRef:
+                  key: user-url
+                  name: utopia-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: orchestrator-service
+spec:
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+      nodePort: 30100
+  selector:
+    app: orchestrator
