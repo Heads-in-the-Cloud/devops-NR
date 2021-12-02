@@ -18,11 +18,11 @@ pipeline {
     stages {
         stage('Load images') {
             steps {
-                sh "minikube load image auth"
-                sh "minikube load image user"
-                sh "minikube load image flight"
-                sh "minikube load image booking"
-                sh "minikube load image orchestrator"
+                sh "minikube image load auth"
+                sh "minikube image load user"
+                sh "minikube image load flight"
+                sh "minikube image load booking"
+                sh "minikube image load orchestrator"
             }
         }
         stage('Apply') {
