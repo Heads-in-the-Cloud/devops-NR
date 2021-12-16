@@ -1,0 +1,40 @@
+version: "3"
+x-aws-vpc: "vpc-9861b8e1"
+services:
+  auth-microservice:
+    image: 092518599330.dkr.ecr.us-west-2.amazonaws.com/utopia/auth
+    container_name: auth
+    ports:
+      - "${UTOPIA_MICROSERVICE_AUTH_PORT}:${UTOPIA_MICROSERVICE_AUTH_PORT}"
+    env_file:
+      - .env
+  user-microservice:
+    image: 092518599330.dkr.ecr.us-west-2.amazonaws.com/utopia/user
+    container_name: user
+    ports:
+      - "${UTOPIA_MICROSERVICE_USERS_PORT}:${UTOPIA_MICROSERVICE_USERS_PORT}"
+    env_file:
+      - .env
+  flight-microservice:
+    image: 092518599330.dkr.ecr.us-west-2.amazonaws.com/utopia/flight
+    container_name: flight
+    ports:
+      - "${UTOPIA_MICROSERVICE_FLIGHTS_PORT}:${UTOPIA_MICROSERVICE_FLIGHTS_PORT}"
+    env_file:
+      - .env
+  booking-microservice:
+    image: 092518599330.dkr.ecr.us-west-2.amazonaws.com/utopia/booking
+    container_name: booking
+    ports:
+      - "${UTOPIA_MICROSERVICE_BOOKINGS_PORT}:${UTOPIA_MICROSERVICE_BOOKINGS_PO\
+        RT}"
+    env_file:
+      - .env
+  orchestrator:
+    image: 092518599330.dkr.ecr.us-west-2.amazonaws.com/utopia/orchestrator
+    container_name: orchestrator
+    ports:
+      - "${UTOPIA_MICROSERVICE_ORCHESTRATOR_PORT}:${UTOPIA_MICROSERVICE_ORCHEST\
+        RATOR_PORT}"
+    env_file:
+      - .env
