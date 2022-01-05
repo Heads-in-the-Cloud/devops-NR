@@ -1,40 +1,46 @@
 version: "3"
-x-aws-vpc: "vpc-9861b8e1"
+x-aws-vpc: "${AWS_VPC}"
 services:
   auth-microservice:
-    image: 092518599330.dkr.ecr.us-west-2.amazonaws.com/utopia/auth
+    image: "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${AWS_PROJECT}/auth"
     container_name: auth
     ports:
-      - "${UTOPIA_MICROSERVICE_AUTH_PORT}:${UTOPIA_MICROSERVICE_AUTH_PORT}"
+      - target: 8084
+        x-aws-protocol: http
     env_file:
       - .env
   user-microservice:
-    image: 092518599330.dkr.ecr.us-west-2.amazonaws.com/utopia/user
+    image: "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${AWS_PROJECT}/user"
     container_name: user
     ports:
-      - "${UTOPIA_MICROSERVICE_USERS_PORT}:${UTOPIA_MICROSERVICE_USERS_PORT}"
+      - target: 8083
+        x-aws-protocol: http
     env_file:
       - .env
   flight-microservice:
-    image: 092518599330.dkr.ecr.us-west-2.amazonaws.com/utopia/flight
+    image: "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${AWS_PROJECT}/fl\
+      ight"
     container_name: flight
     ports:
-      - "${UTOPIA_MICROSERVICE_FLIGHTS_PORT}:${UTOPIA_MICROSERVICE_FLIGHTS_PORT}"
+      - target: 8081
+        x-aws-protocol: http
     env_file:
       - .env
   booking-microservice:
-    image: 092518599330.dkr.ecr.us-west-2.amazonaws.com/utopia/booking
+    image: "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${AWS_PROJECT}/bo\
+      oking"
     container_name: booking
     ports:
-      - "${UTOPIA_MICROSERVICE_BOOKINGS_PORT}:${UTOPIA_MICROSERVICE_BOOKINGS_PO\
-        RT}"
+      - target: 8082
+        x-aws-protocol: http
     env_file:
       - .env
   orchestrator:
-    image: 092518599330.dkr.ecr.us-west-2.amazonaws.com/utopia/orchestrator
+    image: "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${AWS_PROJECT}/or\
+      chestrator"
     container_name: orchestrator
     ports:
-      - "${UTOPIA_MICROSERVICE_ORCHESTRATOR_PORT}:${UTOPIA_MICROSERVICE_ORCHEST\
-        RATOR_PORT}"
+      - target: 8080
+        x-aws-protocol: http
     env_file:
       - .env
