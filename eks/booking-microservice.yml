@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: utopia
+  labels:
+    app: booking
+    app.kubernetes.io/name: utopia-booking
+  name: booking-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: utopia-booking
+      app: booking
+  template:
+    metadata:
+      labels:
+        app: booking
+        app.kubernetes.io/name: utopia-booking
+    spec:
+      containers:
+        - name: booking
+          image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/nr-utopia-booking
+          ports:
+            - containerPort: 8082
+          env:
+            - name: UTOPIA_DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  key: db_host
+                  name: utopia-secret
+            - name: UTOPIA_DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  key: db_name
+                  name: utopia-secret
+            - name: UTOPIA_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: db_password
+                  name: utopia-secret
+            - name: UTOPIA_DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  key: db_port
+                  name: utopia-secret
+            - name: UTOPIA_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  key: db_user
+                  name: utopia-secret
+            - name: UTOPIA_JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: jwt_secret
+                  name: utopia-secret
+            - name: UTOPIA_MICROSERVICE_BOOKINGS_PORT
+              valueFrom:
+                secretKeyRef:
+                  key: booking_port
+                  name: utopia-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: utopia
+  name: booking-service
+  labels:
+    app: booking
+    app.kubernetes.io/name: utopia-booking
+spec:
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8082
+  selector:
+    app.kubernetes.io/name: utopia-booking
