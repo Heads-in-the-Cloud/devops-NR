@@ -28,7 +28,7 @@ pipeline {
         }
         stage('Add lb charts') {
             environment {
-                VPC_ID = sh(script:'aws eks describe-cluster --name ${CLUSTER_NAME} --query 'cluster.resourcesVpcConfig.vpcId' | jq -r', returnStdout: true).trim()
+                VPC_ID = sh(script:'aws eks describe-cluster --name ${CLUSTER_NAME} --query "cluster.resourcesVpcConfig.vpcId" | jq -r', returnStdout: true).trim()
             }
             steps {
                 sh 'kubectl apply -k "github.com/aws/eks-charts/stable/aws-load-balancer-controller//crds?ref=master"'
