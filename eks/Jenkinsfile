@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        AWS_REGION = "${sh(script:'aws configure get region', returnStdout: true).trim()}"
-        AWS_ACCOUNT_ID = "${sh(script:'aws sts get-caller-identity --query "Account" --output text', returnStdout: true).trim()}"
+        AWS_REGION = credentials('aws_region')
+        AWS_ACCOUNT_ID = credentials('aws_account_id')
         utopia_secret = credentials('utopia_secret')
         CLUSTER_NAME = credentials('cluster_name')
         NAMESPACE = credentials('namespace')
@@ -41,12 +41,10 @@ pipeline {
                 sh 'kubectl apply -f eks/namespace.yml'
                 sh 'kubectl apply -f eks/ingress.yml'
                 sh 'kubectl apply -f eks/'
-                sh """
-                sed -e 's/$AWS_REGION/'"$AWS_REGION"'/g' -e 's/$AWS_ACCOUNT_ID/'"$AWS_ACCOUNT_ID"'/g' eks/deployments/auth-microservice.yml | kubectl apply -f - &&
-                sed -e 's/$AWS_REGION/'"$AWS_REGION"'/g' -e 's/$AWS_ACCOUNT_ID/'"$AWS_ACCOUNT_ID"'/g' eks/deployments/booking-microservice.yml | kubectl apply -f - &&
-                sed -e 's/$AWS_REGION/'"$AWS_REGION"'/g' -e 's/$AWS_ACCOUNT_ID/'"$AWS_ACCOUNT_ID"'/g' eks/deployments/flight-microservice.yml | kubectl apply -f - &&
-                sed -e 's/$AWS_REGION/'"$AWS_REGION"'/g' -e 's/$AWS_ACCOUNT_ID/'"$AWS_ACCOUNT_ID"'/g' eks/deployments/user-microservice.yml | kubectl apply -f -
-                """
+                sh "sed -e 's/$AWS_REGION/'\"$AWS_REGION\"'/g' -e 's/$AWS_ACCOUNT_ID/'\"$AWS_ACCOUNT_ID\"'/g' eks/deployments/auth-microservice.yml | kubectl apply -f -"
+                sh "sed -e 's/$AWS_REGION/'\"$AWS_REGION\"'/g' -e 's/$AWS_ACCOUNT_ID/'\"$AWS_ACCOUNT_ID\"'/g' eks/deployments/booking-microservice.yml | kubectl apply -f -"
+                sh "sed -e 's/$AWS_REGION/'\"$AWS_REGION\"'/g' -e 's/$AWS_ACCOUNT_ID/'\"$AWS_ACCOUNT_ID\"'/g' eks/deployments/flight-microservice.yml | kubectl apply -f -"
+                sh "sed -e 's/$AWS_REGION/'\"$AWS_REGION\"'/g' -e 's/$AWS_ACCOUNT_ID/'\"$AWS_ACCOUNT_ID\"'/g' eks/deployments/user-microservice.yml | kubectl apply -f -"
             }
         }
     }
