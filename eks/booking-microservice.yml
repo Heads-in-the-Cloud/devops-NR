@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: booking
-          image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/nr-utopia-booking
+          image: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/nr-utopia-booking
           ports:
             - containerPort: 8082
           env:

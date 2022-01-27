@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: user
-          image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/nr-utopia-user
+          image: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/nr-utopia-user
           ports:
             - containerPort: 8083
           env:
