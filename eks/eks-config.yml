@@ -5,6 +5,9 @@ metadata:
   name: utopia-cluster
   region: us-west-2
 
+vpc:
+  id: ${VPC_ID}
+
 fargateProfiles:
   - name: fp-default
     selectors:
