@@ -39,7 +39,7 @@ pipeline {
             steps {
                 sh 'cp $utopia_secret eks/'
                 sh 'kubectl apply -f eks/namespace.yml'
-                sh 'kubectl apply -f eks/ingress.yml -f utopia-secret.yml -f utopia-config.yml'
+                sh 'kubectl apply -f eks/ingress.yml -f eks/$utopia_secret -f utopia-config.yml'
                 sh "sed -e 's/$AWS_REGION/'\"$AWS_REGION\"'/g' -e 's/$AWS_ACCOUNT_ID/'\"$AWS_ACCOUNT_ID\"'/g' auth-microservice.yml | kubectl apply -f -"
                 sh "sed -e 's/$AWS_REGION/'\"$AWS_REGION\"'/g' -e 's/$AWS_ACCOUNT_ID/'\"$AWS_ACCOUNT_ID\"'/g' booking-microservice.yml | kubectl apply -f -"
                 sh "sed -e 's/$AWS_REGION/'\"$AWS_REGION\"'/g' -e 's/$AWS_ACCOUNT_ID/'\"$AWS_ACCOUNT_ID\"'/g' flight-microservice.yml | kubectl apply -f -"
