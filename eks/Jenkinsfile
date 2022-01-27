@@ -2,27 +2,44 @@ pipeline {
     agent any
 
     environment {
-        VPC_ID = credentials('vpc_id')
-        AWS_REGION = credentials('aws_region')
+        AWS_REGION = "${sh(script:'aws configure get region', returnStdout: true).trim()}"
+        AWS_ACCOUNT_ID = "${sh(script:'aws sts get-caller-identity --query "Account" --output text', returnStdout: true).trim()}"
         utopia_secret = credentials('utopia_secret')
+        CLUSTER_NAME = credentials('cluster_name')
+        NAMESPACE = credentials('namespace')
     }
 
     stages {
         stage('Create cluster') {
             steps {
-                sh 'eksctl create cluster -f eks/eks-config.yml'
+                sh 'eksctl create cluster --name=${CLUSTER_NAME} --fargate'
+            }
+        }
+        stage('Create fargate profile') {
+            steps {
+                sh 'eksctl create fargateprofile --namespace ${NAMESPACE} --cluster ${CLUSTER_NAME}'
+            }
+        }
+        stage('OIDC') {
+            steps {
+                sh 'eksctl utils associate-iam-oidc-provider --region ${AWS_REGION} --cluster ${CLUSTER_NAME} --approve'
+                sh 'eksctl create iamserviceaccount --cluster=${CLUSTER_NAME} --namespace=kube-system --name=aws-load-balancer-controller --attach-policy-arn=arn:aws:iam::${AWS_ACCOUNT_ID}:policy/AWSLoadBalancerControllerIAMPolicy --override-existing-serviceaccounts --region ${AWS_REGION} --approve'
             }
         }
         stage('Add lb charts') {
+            environment {
+                VPC_ID = sh(script:'aws eks describe-cluster --name ${CLUSTER_NAME} --query 'cluster.resourcesVpcConfig.vpcId' | jq -r', returnStdout: true).trim()
+            }
             steps {
                 sh 'kubectl apply -k "github.com/aws/eks-charts/stable/aws-load-balancer-controller//crds?ref=master"'
-                sh 'helm install aws-load-balancer-controller eks/aws-load-balancer-controller -n kube-system --set clusterName=utopia-cluster --set serviceAccount.create=false --set serviceAccount.name=aws-load-balancer-controller --set region=${AWS_REGION} --set vpcId=${VPC_ID}'
+                sh 'helm install aws-load-balancer-controller eks/aws-load-balancer-controller -n kube-system --set clusterName=${CLUSTER_NAME} --set serviceAccount.create=false --set serviceAccount.name=aws-load-balancer-controller --set region=${AWS_REGION} --set vpcId=${VPC_ID}'
             }
         }
         stage('Deploy') {
             steps {
                 sh 'cp $utopia_secret eks/'
                 sh 'kubectl apply -f eks/namespace.yml'
+                sh 'kubectl apply -f eks/ingress.yml'
                 sh 'kubectl apply -f eks/'
             }
         }
