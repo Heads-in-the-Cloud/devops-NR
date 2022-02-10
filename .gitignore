@@ -2,3 +2,6 @@
 *-secret.yml
 .vscode
 *.bak
+.terraform
+*.lock*
+*.tfstate*
