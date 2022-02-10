@@ -1,0 +1,277 @@
+AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+  DBusername:
+    Type: String
+    Default: "{{resolve:secretsmanager:utopia/mysql/db:SecretString:username}}"
+    NoEcho: true
+  DBpassword:
+    Type: String
+    Default: "{{resolve:secretsmanager:utopia/mysql/db:SecretString:password}}"
+    NoEcho: true
+  DBhost:
+    Type: String
+    Default: "{{resolve:secretsmanager:utopia/mysql/db:SecretString:host}}"
+    NoEcho: true
+  DBport:
+    Type: String
+    Default: "{{resolve:secretsmanager:utopia/mysql/db:SecretString:port}}"
+    NoEcho: true
+Resources:
+  myVPC:
+    Type: "AWS::EC2::VPC"
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: "true"
+      EnableDnsHostnames: "true"
+  publicSubnet1:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      VpcId: !Ref myVPC
+      CidrBlock: 10.0.0.0/24
+      AvailabilityZone: !Select
+        - "0"
+        - !GetAZs ""
+  publicSubnet2:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      VpcId: !Ref myVPC
+      CidrBlock: 10.0.1.0/24
+      AvailabilityZone: !Select
+        - "1"
+        - !GetAZs ""
+  myIgw:
+    Type: "AWS::EC2::InternetGateway"
+    Properties: {}
+    Metadata:
+      "AWS::CloudFormation::Designer":
+        id: 1a6176cd-5425-462b-ab48-66ad806f662c
+  myRt:
+    Type: "AWS::EC2::RouteTable"
+    Properties:
+      VpcId: !Ref myVPC
+  EC2VPCG37NTD:
+    Type: "AWS::EC2::VPCGatewayAttachment"
+    Properties:
+      VpcId: !Ref myVPC
+      InternetGatewayId: !Ref myIgw
+  pub1Assoc:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties:
+      RouteTableId: !Ref myRt
+      SubnetId: !Ref publicSubnet1
+  pub2Assoc:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties:
+      RouteTableId: !Ref myRt
+      SubnetId: !Ref publicSubnet2
+  EC2R3MVCX:
+    Type: "AWS::EC2::Route"
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref myIgw
+      RouteTableId: !Ref myRt
+  ecssg:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: Utopia security group
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 8080
+          ToPort: 8080
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: 0.0.0.0/0
+      VpcId: !Ref myVPC
+  ecsagent:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+  instanceprofile:
+    Type: "AWS::IAM::InstanceProfile"
+    Properties:
+      Roles:
+        - !Ref ecsagent
+  utopiacluster:
+    Type: "AWS::ECS::Cluster"
+    Properties:
+      ClusterName: utopia-cluster
+      CapacityProviders:
+        - FARGATE
+      DefaultCapacityProviderStrategy:
+        - CapacityProvider: FARGATE
+          Weight: 1
+  utopiatd:
+    Type: "AWS::ECS::TaskDefinition"
+    Properties:
+      ExecutionRoleArn: !GetAtt
+        - ecsagent
+        - Arn
+      Cpu: "512"
+      Memory: "1024"
+      NetworkMode: awsvpc
+      ContainerDefinitions:
+        - Essential: true
+          Name: auth
+          Image: "{{resolve:ssm:utopia_image_auth:1}}"
+          Environment:
+            - Name: UTOPIA_DB_HOST
+              Value: !Ref DBhost
+            - Name: UTOPIA_DB_PORT
+              Value: !Ref DBport
+            - Name: UTOPIA_DB_USER
+              Value: !Ref DBusername
+            - Name: UTOPIA_DB_PASSWORD
+              Value: !Ref DBpassword
+            - Name: UTOPIA_DB_NAME
+              Value: "{{resolve:ssm:utopia_db_name:1}}"
+            - Name: UTOPIA_MICROSERVICE_AUTH_PORT
+              Value: "{{resolve:ssm:utopia_port_auth:1}}"
+            - Name: UTOPIA_JWT_SECRET
+              Value: "{{resolve:ssm:utopia_jwt_secret:1}}"
+          PortMappings:
+            - Protocol: tcp
+              ContainerPort: 8084
+              HostPort: 8084
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: /fargate/service/utopia
+              awslogs-stream-prefix: ecs
+              awslogs-region: !Ref "AWS::Region"
+        - Essential: true
+          Name: flight
+          Image: "{{resolve:ssm:utopia_image_flight:1}}"
+          Environment:
+            - Name: UTOPIA_DB_HOST
+              Value: !Ref DBhost
+            - Name: UTOPIA_DB_PORT
+              Value: !Ref DBport
+            - Name: UTOPIA_DB_USER
+              Value: !Ref DBusername
+            - Name: UTOPIA_DB_PASSWORD
+              Value: !Ref DBpassword
+            - Name: UTOPIA_DB_NAME
+              Value: "{{resolve:ssm:utopia_db_name:1}}"
+            - Name: UTOPIA_MICROSERVICE_FLIGHTS_PORT
+              Value: "{{resolve:ssm:utopia_port_flights:1}}"
+            - Name: UTOPIA_JWT_SECRET
+              Value: "{{resolve:ssm:utopia_jwt_secret:1}}"
+          PortMappings:
+            - Protocol: tcp
+              ContainerPort: 8081
+              HostPort: 8081
+        - Essential: true
+          Name: booking
+          Image: "{{resolve:ssm:utopia_image_booking:1}}"
+          Environment:
+            - Name: UTOPIA_DB_HOST
+              Value: !Ref DBhost
+            - Name: UTOPIA_DB_PORT
+              Value: !Ref DBport
+            - Name: UTOPIA_DB_USER
+              Value: !Ref DBusername
+            - Name: UTOPIA_DB_PASSWORD
+              Value: !Ref DBpassword
+            - Name: UTOPIA_DB_NAME
+              Value: "{{resolve:ssm:utopia_db_name:1}}"
+            - Name: UTOPIA_MICROSERVICE_BOOKINGS_PORT
+              Value: "{{resolve:ssm:utopia_port_bookings:1}}"
+            - Name: UTOPIA_JWT_SECRET
+              Value: "{{resolve:ssm:utopia_jwt_secret:1}}"
+          PortMappings:
+            - Protocol: tcp
+              ContainerPort: 8082
+              HostPort: 8082
+        - Essential: true
+          Name: user
+          Image: "{{resolve:ssm:utopia_image_user:1}}"
+          PortMappings:
+            - Protocol: tcp
+              ContainerPort: 8083
+              HostPort: 8083
+          Environment:
+            - Name: UTOPIA_DB_HOST
+              Value: !Ref DBhost
+            - Name: UTOPIA_DB_PORT
+              Value: !Ref DBport
+            - Name: UTOPIA_DB_USER
+              Value: !Ref DBusername
+            - Name: UTOPIA_DB_PASSWORD
+              Value: !Ref DBpassword
+            - Name: UTOPIA_DB_NAME
+              Value: "{{resolve:ssm:utopia_db_name:1}}"
+            - Name: UTOPIA_MICROSERVICE_USERS_PORT
+              Value: "{{resolve:ssm:utopia_port_users:1}}"
+            - Name: UTOPIA_JWT_SECRET
+              Value: "{{resolve:ssm:utopia_jwt_secret:1}}"
+        - Essential: true
+          Name: orchestrator
+          Image: "{{resolve:ssm:utopia_image_orchestrator:1}}"
+          Environment:
+            - Name: UTOPIA_MICROSERVICE_BOOKINGS_PORT
+              Value: "{{resolve:ssm:utopia_port_bookings:1}}"
+            - Name: UTOPIA_MICROSERVICE_FLIGHTS_PORT
+              Value: "{{resolve:ssm:utopia_port_flights:1}}"
+            - Name: UTOPIA_MICROSERVICE_USERS_PORT
+              Value: "{{resolve:ssm:utopia_port_users:1}}"
+            - Name: UTOPIA_MICROSERVICE_AUTH_PORT
+              Value: "{{resolve:ssm:utopia_port_auth:1}}"
+            - Name: UTOPIA_MICROSERVICE_ORCHESTRATOR_PORT
+              Value: "{{resolve:ssm:utopia_port_orchestrator:1}}"
+          PortMappings:
+            - Protocol: tcp
+              ContainerPort: 8080
+              HostPort: 8080
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: /fargate/service/utopia
+              awslogs-stream-prefix: ecs
+              awslogs-region: !Ref "AWS::Region"
+    DependsOn:
+      - LLG34ZPS
+  ECSS4OQM3:
+    Type: "AWS::ECS::Service"
+    Properties:
+      Cluster: !Ref utopiacluster
+      DesiredCount: 1
+      TaskDefinition: !Ref utopiatd
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+            - !Ref ecssg
+          Subnets:
+            - !Ref publicSubnet1
+            - !Ref publicSubnet2
+  LLG34ZPS:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName: /fargate/service/utopia
+      RetentionInDays: "1"
