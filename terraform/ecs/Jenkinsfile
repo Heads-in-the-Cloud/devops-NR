@@ -1,0 +1,26 @@
+pipeline {
+    agent any
+    stages {
+        stage('Init') {
+            steps {
+                dir('terraform/ecs') {
+                    sh 'terraform init'
+                }
+            }
+        }
+        stage('Plan') {
+            steps {
+                dir('terraform/ecs') {
+                    sh 'terraform plan'
+                }
+            }
+        }
+        stage('Apply') {
+            steps {
+                dir('terraform/ecs') {
+                    sh 'terraform apply -auto-approve'
+                }
+            }
+        }
+    }
+}
