@@ -18,8 +18,7 @@ services:
     env_file:
       - .env
   flight-microservice:
-    image: "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${AWS_PROJECT}/fl\
-      ight"
+    image: "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${AWS_PROJECT}/flight"
     container_name: flight
     ports:
       - target: 8081
@@ -27,8 +26,7 @@ services:
     env_file:
       - .env
   booking-microservice:
-    image: "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${AWS_PROJECT}/bo\
-      oking"
+    image: "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${AWS_PROJECT}/booking"
     container_name: booking
     ports:
       - target: 8082
@@ -36,8 +34,7 @@ services:
     env_file:
       - .env
   orchestrator:
-    image: "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${AWS_PROJECT}/or\
-      chestrator"
+    image: "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${AWS_PROJECT}/orchestrator"
     container_name: orchestrator
     ports:
       - target: 8080
