@@ -42,9 +42,6 @@ Resources:
   myIgw:
     Type: "AWS::EC2::InternetGateway"
     Properties: {}
-    Metadata:
-      "AWS::CloudFormation::Designer":
-        id: 1a6176cd-5425-462b-ab48-66ad806f662c
   myRt:
     Type: "AWS::EC2::RouteTable"
     Properties:
