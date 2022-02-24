@@ -2,3 +2,5 @@
 *-secret.yml
 .vscode
 *.bak
+vars.yaml
+ansible/resources/
