@@ -4,3 +4,5 @@
 *.bak
 vars.yaml
 ansible/resources/
+.terraform*
+*.tfstate*

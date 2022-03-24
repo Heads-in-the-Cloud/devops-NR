@@ -1,0 +1,5 @@
+- hosts: localhost
+  tasks:
+    - name: Restart Deployment
+      shell: |
+        kubectl rollout restart deployments/bookings-deployment
