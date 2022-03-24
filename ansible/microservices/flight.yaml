@@ -1,0 +1,5 @@
+- hosts: localhost
+  tasks:
+    - name: Restart Flights
+      shell: |
+        kubectl rollout restart deployments/flight-deployment

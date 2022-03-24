@@ -1,5 +1,5 @@
 - hosts: localhost
   tasks:
-    - name: Restart Deployment
+    - name: Restart Auth
       shell: |
-        kubectl rollout restart deployments/bookings-deployment
+        kubectl rollout restart deployments/auth-deployment
