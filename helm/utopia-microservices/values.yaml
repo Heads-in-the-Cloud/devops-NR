@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   repository: ""
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
 
@@ -21,7 +21,7 @@ aws:
 service:
   type: ClusterIP
   port: 80
-  targetPort: 8084
+  targetPort: 8080
 
 ingress:
   enabled: false
