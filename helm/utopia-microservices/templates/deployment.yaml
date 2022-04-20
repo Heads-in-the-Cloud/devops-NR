@@ -15,7 +15,9 @@ spec:
   template:
     metadata:
       labels:
-        {{- include "utopia-microservices.selectorLabels" . | nindent 8 }}
+        {{- include "utopia-microservices.labels" . | nindent 8 }}
+      annotations:
+        fluentbit.io/parser: cri
     spec:
       containers:
         - name: {{ .Release.Name }}
