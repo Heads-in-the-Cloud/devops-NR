@@ -2,28 +2,28 @@ pipeline {
     agent { label 'aws-ready' }
 
     stages {
-        stage('Run TFlint'){
-            steps{
-                dir("terraform/"){
+        stage('Run TFlint') {
+            steps {
+                dir("terraform/") {
                     sh 'tflint --init'
                     sh 'tflint'
                 }
             }
             post {
-                success{
+                success {
                     echo 'tflint passed'
                 }
             }
         }
-        stage('Run Terratest'){
-            steps{
+        stage('Run Terratest') {
+            steps {
                 dir("test/") {
                     sh 'go mod tidy'
                     sh 'go test network_test.go -v -timeout 30m'
                 }
             }
             post{
-                failure{
+                failure {
                     sh 'echo test failed'
                 }
             }
@@ -37,9 +37,8 @@ pipeline {
         }
         stage('Terraform plan') {
             steps {
-                script{
-                        sh 'terraform plan' 
-                    }
+                script {
+                        sh 'terraform plan'
                 }
             }
         }
