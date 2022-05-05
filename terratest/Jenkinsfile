@@ -2,7 +2,7 @@ pipeline {
     agent { label 'aws-ready' }
 
     tools {
-        go 'go.1.18' 
+        go 'go1.18' 
     }
 
     stages {
