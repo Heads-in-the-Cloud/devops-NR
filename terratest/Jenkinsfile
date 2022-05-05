@@ -18,6 +18,7 @@ pipeline {
         stage('Run Terratest') {
             steps {
                 dir("test/") {
+                    sh 'go mod init network'
                     sh 'go mod tidy'
                     sh 'go test network_test.go -v -timeout 30m'
                 }
@@ -30,15 +31,19 @@ pipeline {
         }
         stage('Terraform init') {
             steps {
-                script {
-                    sh 'terraform init'
+                dir("terraform/") {
+                    script {
+                        sh 'terraform init'
+                    }
                 }
             }
         }
         stage('Terraform plan') {
             steps {
-                script {
+                dir("terraform/") {
+                    script {
                         sh 'terraform plan'
+                    }
                 }
             }
         }
