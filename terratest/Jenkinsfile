@@ -18,7 +18,7 @@ pipeline {
         stage('Run Terratest') {
             steps {
                 dir("test/") {
-                    sh 'rm go.mod && rm go.sum'
+                    sh 'rm go.mod'
                     sh 'go mod init network'
                     sh 'go mod tidy'
                     sh 'go test network_test.go -v -timeout 30m'
