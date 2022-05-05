@@ -17,7 +17,7 @@ spec:
       labels:
         {{- include "utopia-microservices.labels" . | nindent 8 }}
       annotations:
-        fluentbit.io/parser: cri
+        fluentbit.io/parser: spring
     spec:
       containers:
         - name: {{ .Release.Name }}
