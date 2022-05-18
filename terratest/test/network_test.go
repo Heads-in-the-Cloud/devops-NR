@@ -24,7 +24,6 @@ func TestTerraformAwsNetwork(t *testing.T) {
 	private2SubnetCidr := "10.10.4.0/24"
 
 	terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
-		// The path to where our Terraform code is located
 		TerraformDir: "../terraform",
 
 		// Variables to pass to our Terraform code using -var options
