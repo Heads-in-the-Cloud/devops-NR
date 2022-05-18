@@ -1,0 +1,5 @@
+- hosts: localhost
+  tasks:
+    - name: Restart Users
+      shell: |
+        kubectl rollout restart deployments/user-deployment

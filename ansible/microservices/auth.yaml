@@ -1,0 +1,5 @@
+- hosts: localhost
+  tasks:
+    - name: Restart Auth
+      shell: |
+        kubectl rollout restart deployments/auth-deployment
