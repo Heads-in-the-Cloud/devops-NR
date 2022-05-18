@@ -1,2 +1,11 @@
 .env
-*-secret.yml
+.vscode
+ansible/resources
+*-secret.*
+.terraform*
+*.tfstate*
+/test
+*/resources
+*.bak
+ansible/resources
+vars*

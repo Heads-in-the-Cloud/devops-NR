@@ -1,0 +1,30 @@
+pipeline {
+    agent any
+
+    environment {
+        UTOPIA_MICROSERVICE_ORCHESTRATOR_PORT=credentials('orchestrator_port')
+        UTOPIA_MICROSERVICE_FLIGHTS_PORT=credentials('flights_port')
+        UTOPIA_MICROSERVICE_AUTH_PORT=credentials('auth_port')
+        UTOPIA_MICROSERVICE_USERS_PORT=credentials('users_port')
+        UTOPIA_MICROSERVICE_BOOKINGS_PORT=credentials('bookings_port')
+        UTOPIA_DB_PORT=credentials('db_port')
+        UTOPIA_DB_HOST=credentials('db_host')
+        UTOPIA_DB_NAME=credentials('db_name')
+        UTOPIA_DB_USER=credentials('db_user')
+        UTOPIA_DB_PASSWORD=credentials('db_password')
+        UTOPIA_JWT_SECRET=credentials('jwt_secret')
+    }
+
+    stages {
+        stage('Apply') {
+            steps {
+                sh 'kubectl apply -f .'
+            }
+        }
+        stage('Delete') {
+            steps {
+                sh 'kubectl delete -f .'
+            }
+        }
+    }
+}

@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: auth
+  name: auth-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth
+  template:
+    metadata:
+      labels:
+        app: auth
+    spec:
+      containers:
+        - name: auth
+          image: auth # minikube load image <image-name>
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8084
+          env:
+            - name: UTOPIA_DB_HOST
+              value: $(UTOPIA_DB_HOST)
+            - name: UTOPIA_DB_NAME
+              value: $(UTOPIA_DB_NAME)
+            - name: UTOPIA_DB_PASSWORD
+              value: $(UTOPIA_DB_PASSWORD)
+            - name: UTOPIA_DB_PORT
+              value: $(UTOPIA_DB_PORT)
+            - name: UTOPIA_DB_USER
+              value: $(UTOPIA_DB_USER)
+            - name: UTOPIA_JWT_SECRET
+              value: $(UTOPIA_JWT_SECRET)
+            - name: UTOPIA_MICROSERVICE_AUTH_PORT
+              value: $(UTOPIA_MICROSERVICE_AUTH_PORT)
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+spec:
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8084
+  selector:
+    app: auth
