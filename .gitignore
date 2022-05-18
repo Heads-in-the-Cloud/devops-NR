@@ -1,5 +1,5 @@
 .env
-*-secret.yml
+*-secret.y*
 .vscode
 /test
 *.tfstate*
