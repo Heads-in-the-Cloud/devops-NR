@@ -1,0 +1,43 @@
+version: "3"
+x-aws-vpc: "${AWS_VPC}"
+services:
+  auth-microservice:
+    image: "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${AWS_PROJECT}/auth"
+    container_name: auth
+    ports:
+      - target: 8084
+        x-aws-protocol: http
+    env_file:
+      - .env
+  user-microservice:
+    image: "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${AWS_PROJECT}/user"
+    container_name: user
+    ports:
+      - target: 8083
+        x-aws-protocol: http
+    env_file:
+      - .env
+  flight-microservice:
+    image: "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${AWS_PROJECT}/flight"
+    container_name: flight
+    ports:
+      - target: 8081
+        x-aws-protocol: http
+    env_file:
+      - .env
+  booking-microservice:
+    image: "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${AWS_PROJECT}/booking"
+    container_name: booking
+    ports:
+      - target: 8082
+        x-aws-protocol: http
+    env_file:
+      - .env
+  orchestrator:
+    image: "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${AWS_PROJECT}/orchestrator"
+    container_name: orchestrator
+    ports:
+      - target: 8080
+        x-aws-protocol: http
+    env_file:
+      - .env
