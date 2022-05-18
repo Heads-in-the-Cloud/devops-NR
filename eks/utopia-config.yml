@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: utopia-config
+data:
+  auth-url: auth-service
+  flight-url: flight-service
+  booking-url: booking-service
+  user-url: user-service
