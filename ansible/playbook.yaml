@@ -1,0 +1,26 @@
+---
+- name: Deploy to K8s
+  hosts: localhost
+  vars_files:
+    - vars.yaml
+
+  tasks:
+    - name: Create fargate profile
+      shell: |
+        eksctl create fargateprofile --namespace {{ eksNamespace }} --cluster {{ cluster }}
+    - name: Create OIDC
+      shell: |
+        eksctl utils associate-iam-oidc-provider --region {{ region }} --cluster {{ cluster }} --approve
+        eksctl create iamserviceaccount --cluster={{ cluster }} --namespace=kube-system --name=aws-load-balancer-controller --attach-policy-arn=arn:aws:iam::{{ id }}:policy/AWSLoadBalancerControllerIAMPolicy --override-existing-serviceaccounts --region {{ region }} --approve
+    - name: Add Charts
+      shell: |
+        kubectl apply -k "github.com/aws/eks-charts/stable/aws-load-balancer-controller//crds?ref=master"
+        helm install aws-load-balancer-controller eks/aws-load-balancer-controller -n kube-system --set clusterName={{ cluster }} --set serviceAccount.create=false --set serviceAccount.name=aws-load-balancer-controller --set region={{ region }} --set vpcId={{ vpcId }}
+        sleep 200
+    - name: Deploy resources
+      shell: |
+        kubectl apply -f namespace.yaml
+        kubectl apply -f utopia-secret.yaml
+        kubectl apply -f ingress.yaml
+        sleep 200
+        kubectl apply -f resources/
