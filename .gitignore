@@ -1,8 +1,11 @@
 .env
 *-secret.y*
 .vscode
+/test
+*.tfstate*
+*/resources
+*-secret.y*
 *.bak
 ansible/resources
 vars*
 .terraform*
-*.tfstate*
