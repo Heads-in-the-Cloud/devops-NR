@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: utopia
+  labels:
+    app: auth
+    app.kubernetes.io/name: utopia-auth
+  name: auth-blue
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      version: blue
+      app: auth
+  template:
+    metadata:
+      labels:
+        app: auth
+        version: blue
+    spec:
+      containers:
+        - name: auth
+          image: ${IMAGE}
+          ports:
+            - containerPort: 8080
+          env:
+            - name: UTOPIA_DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  key: db_host
+                  name: utopia-secret
+            - name: UTOPIA_DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  key: db_name
+                  name: utopia-secret
+            - name: UTOPIA_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: db_password
+                  name: utopia-secret
+            - name: UTOPIA_DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  key: db_port
+                  name: utopia-secret
+            - name: UTOPIA_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  key: db_user
+                  name: utopia-secret
+            - name: UTOPIA_JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: jwt_secret
+                  name: utopia-secret
+            - name: UTOPIA_MICROSERVICE_PORT
+              valueFrom:
+                secretKeyRef:
+                  key: microservice_port
+                  name: utopia-secret
